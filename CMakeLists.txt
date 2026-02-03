@@ -15,6 +15,7 @@ if (NOT nlohmann_json_FOUND)
     FetchContent_Declare(
       nlohmann_json
       URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+      DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
     FetchContent_MakeAvailable(nlohmann_json)
   else()
@@ -43,6 +44,7 @@ if (CPPDEEPSEEK_USE_LLAMA)
       llama_cpp
       GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
       GIT_TAG b7472
+      DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
     FetchContent_MakeAvailable(llama_cpp)
   else()
