@@ -83,7 +83,7 @@ std::string Generate(llama_context* ctx,
 LlamaBackend::LlamaBackend(std::string model_path, int n_ctx, int n_threads)
     : model_path_(std::move(model_path)), n_ctx_(n_ctx), n_threads_(n_threads) {
   // Silence llama.cpp logs to keep demo output readable.
-  llama_log_set([](llama_log_level, const char*, void*) {}, nullptr);
+  llama_log_set([](ggml_log_level, const char*, void*) {}, nullptr);
   llama_backend_init();
 
   llama_model_params mparams = llama_model_default_params();

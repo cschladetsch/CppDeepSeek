@@ -5,8 +5,7 @@ High-performance C++20 client for DeepSeek-R1 with reasoning separation, streami
 **Quickstart (least friction)**
 ```bash
 ./b --deps
-./b
-./demo.sh
+./b --demo
 ```
 `demo.sh` requires CUDA by default. Use `DEMO_NO_CUDA=1` to run CPU-only.
 
@@ -69,7 +68,7 @@ By default, the app expects:
 `~/.local/share/deepseek/models/deepseek-r1/model.gguf`
 
 **Default model download (medium/pro)**
-The build script downloads **DeepSeek‑R1‑Distill‑Qwen‑14B GGUF** (Q4_K_M) from the `bartowski` Hugging Face repo unless you set `DEEPSEEK_MODEL_SKIP=1`. The Q4_K_M file size is ~8.99 GB, so plan disk/ram accordingly. citeturn0search0
+The build script downloads **DeepSeek‑R1‑Distill‑Qwen‑14B GGUF** (Q4_K_M) unless you set `DEEPSEEK_MODEL_SKIP=1`. The file is about 9 GB, so plan disk/ram accordingly.
 
 Override the model URL:
 ```bash

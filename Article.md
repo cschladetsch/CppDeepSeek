@@ -125,11 +125,12 @@ If you want to try it:
 
 ```bash
 ./b --deps
-./b
-./demo.sh
+./b --demo
 ```
 
 That’s the least‑friction path. The model download happens automatically, and everything else just runs.
+
+> Note: On WSL2, CUDA must be installed **inside WSL2** (not via `/mnt/c`). The setup script handles this and will fail early if CUDA isn’t ready. For CPU‑only demos, set `DEMO_NO_CUDA=1`.
 
 ---
 
