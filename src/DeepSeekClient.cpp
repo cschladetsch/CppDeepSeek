@@ -28,7 +28,7 @@ struct StreamState {
   std::string* error_out = nullptr;
 };
 
-size_t StreamCallback(void* ptr, size_t size, size_t nmemb, void* userdata) {
+size_t StreamWriteCallback(void* ptr, size_t size, size_t nmemb, void* userdata) {
   auto* state = static_cast<StreamState*>(userdata);
   const size_t total = size * nmemb;
   if (!state->parser.Feed(std::string_view(static_cast<const char*>(ptr), total),
@@ -175,7 +175,7 @@ bool DeepSeekClient::stream_chat(const std::vector<Message>& messages,
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload_str.c_str());
   curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout_ms_);
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StreamCallback);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, StreamWriteCallback);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &state);
 
   CURLcode res = curl_easy_perform(curl);

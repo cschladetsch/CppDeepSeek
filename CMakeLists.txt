@@ -7,30 +7,37 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(CURL REQUIRED)
 
+option(CPPDEEPSEEK_ALLOW_FETCHCONTENT "Allow downloading dependencies via FetchContent" OFF)
 find_package(nlohmann_json CONFIG QUIET)
 if (NOT nlohmann_json_FOUND)
-  include(FetchContent)
-  FetchContent_Declare(
-    nlohmann_json
-    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
-  )
-  FetchContent_MakeAvailable(nlohmann_json)
+  if (CPPDEEPSEEK_ALLOW_FETCHCONTENT)
+    include(FetchContent)
+    FetchContent_Declare(
+      nlohmann_json
+      URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+  else()
+    message(FATAL_ERROR "nlohmann_json not found. Install nlohmann-json3-dev or enable CPPDEEPSEEK_ALLOW_FETCHCONTENT.")
+  endif()
 endif()
 
+set(MODELSTORE_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(MODELSTORE_ALLOW_FETCHCONTENT OFF CACHE BOOL "" FORCE)
 add_subdirectory(modelstore)
 
 option(CPPDEEPSEEK_BUILD_APP "Build the CppDeepSeek demo application" ON)
 if (CPPDEEPSEEK_BUILD_APP)
   add_executable(CppDeepSeek
-    main.cpp
-    DeepSeekClient.cpp
-    AgentRuntime.cpp
-    LogicGate.cpp
-    CliOptions.cpp
-    LocalBackend.cpp
+    src/main.cpp
+    src/DeepSeekClient.cpp
+    src/AgentRuntime.cpp
+    src/LogicGate.cpp
+    src/CliOptions.cpp
+    src/LocalBackend.cpp
   )
 
-  target_include_directories(CppDeepSeek PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  target_include_directories(CppDeepSeek PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(CppDeepSeek PRIVATE CURL::libcurl nlohmann_json::nlohmann_json ModelStore::ModelStore)
 endif()
 
@@ -45,28 +52,28 @@ if (CPPDEEPSEEK_BUILD_TESTS)
   FetchContent_MakeAvailable(googletest)
   enable_testing()
   include(GoogleTest)
-  add_executable(AgentRuntimeTests tests/AgentRuntimeTests.cpp AgentRuntime.cpp)
-  target_include_directories(AgentRuntimeTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  add_executable(AgentRuntimeTests tests/AgentRuntimeTests.cpp src/AgentRuntime.cpp)
+  target_include_directories(AgentRuntimeTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(AgentRuntimeTests PRIVATE GTest::gtest_main nlohmann_json::nlohmann_json)
   gtest_discover_tests(AgentRuntimeTests)
 
-  add_executable(AgentPersistenceTests tests/AgentPersistenceTests.cpp AgentRuntime.cpp)
-  target_include_directories(AgentPersistenceTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  add_executable(AgentPersistenceTests tests/AgentPersistenceTests.cpp src/AgentRuntime.cpp)
+  target_include_directories(AgentPersistenceTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(AgentPersistenceTests PRIVATE GTest::gtest_main nlohmann_json::nlohmann_json)
   gtest_discover_tests(AgentPersistenceTests)
 
-  add_executable(LogicGateTests tests/LogicGateTests.cpp LogicGate.cpp)
-  target_include_directories(LogicGateTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  add_executable(LogicGateTests tests/LogicGateTests.cpp src/LogicGate.cpp)
+  target_include_directories(LogicGateTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(LogicGateTests PRIVATE GTest::gtest_main)
   gtest_discover_tests(LogicGateTests)
 
-  add_executable(CliOptionsTests tests/CliOptionsTests.cpp CliOptions.cpp)
-  target_include_directories(CliOptionsTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  add_executable(CliOptionsTests tests/CliOptionsTests.cpp src/CliOptions.cpp)
+  target_include_directories(CliOptionsTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(CliOptionsTests PRIVATE GTest::gtest_main)
   gtest_discover_tests(CliOptionsTests)
 
-  add_executable(LocalBackendTests tests/LocalBackendTests.cpp LocalBackend.cpp)
-  target_include_directories(LocalBackendTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  add_executable(LocalBackendTests tests/LocalBackendTests.cpp src/LocalBackend.cpp)
+  target_include_directories(LocalBackendTests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(LocalBackendTests PRIVATE GTest::gtest_main)
   gtest_discover_tests(LocalBackendTests)
 endif()

@@ -7,19 +7,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-include(FetchContent)
-FetchContent_Declare(
-  nlohmann_json
-  URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
-)
-FetchContent_MakeAvailable(nlohmann_json)
+option(MODELSTORE_ALLOW_FETCHCONTENT "Allow downloading dependencies via FetchContent" OFF)
 
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+find_package(nlohmann_json CONFIG QUIET)
+if (NOT nlohmann_json_FOUND)
+  if (MODELSTORE_ALLOW_FETCHCONTENT)
+    include(FetchContent)
+    FetchContent_Declare(
+      nlohmann_json
+      URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+  else()
+    message(FATAL_ERROR "nlohmann_json not found. Install nlohmann-json3-dev or enable MODELSTORE_ALLOW_FETCHCONTENT.")
+  endif()
+endif()
 
 add_library(ModelStore
   src/ModelStore.cpp
@@ -37,16 +39,30 @@ target_include_directories(ModelStore PUBLIC
 target_link_libraries(ModelStore PUBLIC nlohmann_json::nlohmann_json)
 target_compile_features(ModelStore PUBLIC cxx_std_20)
 
-enable_testing()
-include(GoogleTest)
+option(MODELSTORE_BUILD_TESTS "Build ModelStore tests" ON)
+if (MODELSTORE_BUILD_TESTS)
+  if (NOT MODELSTORE_ALLOW_FETCHCONTENT)
+    message(FATAL_ERROR "ModelStore tests require FetchContent. Enable MODELSTORE_ALLOW_FETCHCONTENT.")
+  endif()
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+  )
+  set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
 
-add_executable(ModelStoreTests tests/ModelStoreTests.cpp)
-target_link_libraries(ModelStoreTests PRIVATE ModelStore GTest::gtest_main)
-gtest_discover_tests(ModelStoreTests)
+  enable_testing()
+  include(GoogleTest)
 
-add_executable(StreamParserTests tests/StreamParserTests.cpp)
-target_link_libraries(StreamParserTests PRIVATE ModelStore GTest::gtest_main)
-gtest_discover_tests(StreamParserTests)
+  add_executable(ModelStoreTests tests/ModelStoreTests.cpp)
+  target_link_libraries(ModelStoreTests PRIVATE ModelStore GTest::gtest_main)
+  gtest_discover_tests(ModelStoreTests)
+
+  add_executable(StreamParserTests tests/StreamParserTests.cpp)
+  target_link_libraries(StreamParserTests PRIVATE ModelStore GTest::gtest_main)
+  gtest_discover_tests(StreamParserTests)
+endif()
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -106,6 +122,13 @@ add_custom_command(
   VERBATIM
 )
 
-add_custom_target(ensure_models ALL
-  DEPENDS ${ENSURE_MODELS_STAMP}
-)
+option(MODELSTORE_AUTO_ENSURE_MODELS "Run ensure_models as part of the default build" OFF)
+if (MODELSTORE_AUTO_ENSURE_MODELS)
+  add_custom_target(ensure_models ALL
+    DEPENDS ${ENSURE_MODELS_STAMP}
+  )
+else()
+  add_custom_target(ensure_models
+    DEPENDS ${ENSURE_MODELS_STAMP}
+  )
+endif()

@@ -45,8 +45,12 @@ Default model store:
 - `~/.local/share/deepseek/models`
 
 **ModelStore (separate library)**
-`modelstore/` is a standalone library that can be split into its own repo.  
+`modelstore/` is designed to be split into its own repository and consumed by multiple apps.  
 See `modelstore/README.md` for build, test, and install details.
+
+**Source Layout**
+- `src/`: application source files
+- `include/`: public app headers
 
 **Ensure models via CMake**
 See `modelstore/README.md`.

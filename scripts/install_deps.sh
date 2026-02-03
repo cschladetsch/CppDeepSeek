@@ -8,4 +8,4 @@ if ! command -v apt-get >/dev/null 2>&1; then
 fi
 
 sudo apt-get update
-sudo apt-get install -y libcurl4-openssl-dev
+sudo apt-get install -y build-essential cmake ninja-build libcurl4-openssl-dev nlohmann-json3-dev

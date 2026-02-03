@@ -1,6 +1,6 @@
 # ModelStore
 
-Reusable model‑path and streaming utilities for DeepSeek projects. Intended to live as its own repository and be consumed by multiple applications.
+Reusable model‑path and streaming utilities for DeepSeek projects. This folder is structured to be split into its own repository and consumed by multiple applications.
 
 **Build**
 ```bash
@@ -21,6 +21,7 @@ cmake -S . -B build -DDEEPSEEK_MODELS="deepseek-r1;deepseek-v3"
 cmake --build build --target ensure_models
 ```
 Note: `ensure_models` runs once per build directory (stamp file). Delete `build/.ensure_models.stamp` to re-run.
+To run automatically on every build, configure with `-DMODELSTORE_AUTO_ENSURE_MODELS=ON`.
 
 **Ensure model directories (Python)**
 ```bash
