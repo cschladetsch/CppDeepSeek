@@ -1,8 +1,8 @@
 # CppDeepSeek: Building a Local-First Agent Runtime in C++ (with Real Guardrails)
 
-Most agent demos require an API key, break offline, and have no real guardrails. That's fine for a toy, but it fails quickly in real engineering contexts where you need latency control, reliability guarantees, and enforceable policies. I wanted a system I could demo **offline**, with **repeatable guardrails**, and a clean architecture that could switch between local inference and a hosted API without rewriting the app.
+Most agent demos require an API key, break offline, and have no real guardrails. That's fine for a toy, but it fails quickly in real engineering contexts where latency control, reliability guarantees, and enforceable policies matter. The goal was to build a system that could demo **offline**, with **repeatable guardrails**, and a clean architecture that could switch between local inference and a hosted API without rewriting the app.
 
-This post is a deep-dive into **CppDeepSeek**, a C++20 agent runtime that defaults to local inference (via llama.cpp + GGUF), supports DeepSeek's hosted API as a fallback, and includes an explicit **Logic Gate** to enforce policy. It's intentionally pragmatic, because that's what makes systems ship.
+**CppDeepSeek** is a C++20 agent runtime that defaults to local inference (via llama.cpp + GGUF), supports DeepSeek's hosted API as a fallback, and includes an explicit **Logic Gate** to enforce policy. It's intentionally pragmatic, because that's what makes systems ship.
 
 **Platform Support:** Works on Linux/WSL2 with CUDA support. Mac support available via Metal backend.
 
@@ -10,7 +10,7 @@ This post is a deep-dive into **CppDeepSeek**, a C++20 agent runtime that defaul
 
 ## The Core Goals
 
-I kept the goals simple and testable:
+The design requirements were kept simple and testable:
 
 1. **Local-first by default** (no API key required).  
 2. **Clear policy enforcement** (Logic Gate that can reject inputs).  
@@ -35,7 +35,7 @@ The backend interface is key. It allows the exact same agent code to operate aga
 - a **local llama.cpp** model, or  
 - a **remote DeepSeek API**.
 
-That's the heart of the "local-first" story: the app is always usable, and you can scale up to hosted results only when it helps.
+That's the heart of the "local-first" story: the app is always usable, and scaling up to hosted results happens only when it helps.
 
 ---
 
@@ -47,9 +47,9 @@ Local mode is the default. The system expects a GGUF model at:
 ~/.local/share/deepseek/models/deepseek-r1/model.gguf
 ```
 
-The build script (`./b`) will download a medium/pro default model automatically if it's missing. That gives a frictionless on-ramp while still keeping everything local.
+The build script (`./b`) will download a medium/pro default model automatically if it's missing. That gives a frictionless on-ramp while keeping everything local.
 
-To keep the local backend clean, I created a `LlamaBackend` class that:
+The local backend is implemented via a `LlamaBackend` class that:
 
 - loads the GGUF model  
 - tokenizes prompts  
@@ -66,7 +66,7 @@ The key takeaway: local inference is no longer an afterthought. It is a first-cl
 
 This is not safety theater. The Logic Gate is a real **YES/NO** decision point. It has its own prompt, runs before the debate, and can block inputs outright.
 
-In the demo, I use a "software-engineering-only" gate, which rejects off-topic prompts. That gives a clean, obvious proof that policy enforcement is **built into the flow**, not bolted on.
+In the demo, a "software-engineering-only" gate rejects off-topic prompts. That gives a clean, obvious proof that policy enforcement is **built into the flow**, not bolted on.
 
 From a leadership perspective, that's the difference between "interesting demo" and "deployable architecture."
 
@@ -83,7 +83,7 @@ The runtime is intentionally minimal but complete:
 
 For a blog or demo, the pacing matters. It's hard to appreciate output if it scrolls by instantly. The pause also makes it easy to screen-record and narrate.
 
-We also added **save/load** for memory to keep continuity between runs. This is small, but powerful: you can demo multi-session behavior without any other infrastructure.
+The system includes **save/load** for memory to keep continuity between runs. This is small, but powerful: multi-session behavior can be demoed without any other infrastructure.
 
 The system now starts with an interactive CLI by default - type a topic and press ENTER to begin a debate. This makes exploration natural without requiring command-line arguments.
 
@@ -101,9 +101,9 @@ This is subtle but important: the model cache is **not** tied to a single repo.
 
 That means:
 
-- your model downloads are **not duplicated** (saving disk space),  
+- model downloads are **not duplicated** (saving disk space),  
 - multiple projects can share the same GGUF file,  
-- and you can standardize a "model home" across your team.
+- and teams can standardize a "model home" across their organization.
 
 The folder is designed to be split into its own repo later - which makes it easy to reuse this cache strategy everywhere.
 
@@ -127,7 +127,7 @@ Everything is colored, paced, and easy to follow. It's designed for a demo and a
 
 ## The 3-Command Quickstart
 
-If you want to try it:
+To try it:
 
 ```bash
 ./b --deps
@@ -150,13 +150,13 @@ For engineering teams, this architecture provides:
 - **Backend flexibility** without rewriting code.  
 - **Shared model storage** across multiple repos.
 
-It's not a toy. It's a framework you can build on.
+It's not a toy. It's a framework teams can build on.
 
 ---
 
 ## Next Steps
 
-If I were to extend this, the natural next steps are:
+Natural extensions to this foundation would include:
 
 - Tool-calling and external integrations  
 - Persistent memory in a DB  
@@ -179,8 +179,7 @@ But the MVP already demonstrates the essential architectural ideas.
 
 ---
 
-If you want a walkthrough or a deeper technical review, I'm happy to share.  
-This is a foundation you can actually ship from.
+This is a foundation teams can actually ship from.
 
 **Repository:** [github.com/cschladetsch/CppDeepSeekAgents](https://github.com/cschladetsch/CppDeepSeekAgents)
 
