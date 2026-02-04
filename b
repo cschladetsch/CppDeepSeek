@@ -6,6 +6,7 @@ WITH_MODELS=0
 WITH_TESTS=0
 FORCE_DEPS=0
 WITH_CUDA=1
+CUDA_SET=0
 METAL_MODE=auto
 RUN_DEMO=0
 
@@ -16,7 +17,7 @@ for arg in "$@"; do
     --models) WITH_MODELS=1 ;;
     --tests) WITH_TESTS=1 ;;
     --cuda) WITH_CUDA=1 ;;
-    --no-cuda) WITH_CUDA=0 ;;
+    --no-cuda) WITH_CUDA=0; CUDA_SET=1 ;;
     --demo) RUN_DEMO=1 ;;
     --metal) METAL_MODE=on ;;
     --no-metal) METAL_MODE=off ;;
@@ -27,6 +28,16 @@ for arg in "$@"; do
       ;;
   esac
 done
+
+if [[ "$METAL_MODE" == "on" ]]; then
+  if [[ "$CUDA_SET" -eq 1 && "$WITH_CUDA" -eq 1 ]]; then
+    echo "Metal and CUDA are mutually exclusive. Drop --cuda or use --no-cuda." >&2
+    exit 1
+  fi
+  if [[ "$CUDA_SET" -eq 0 ]]; then
+    WITH_CUDA=0
+  fi
+fi
 
 if [[ "$WITH_DEPS" -eq 1 ]]; then
   if [[ "$FORCE_DEPS" -eq 1 ]]; then

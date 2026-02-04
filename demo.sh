@@ -17,6 +17,9 @@ USE_CUDA=1
 if [[ "${DEMO_NO_CUDA:-0}" == "1" ]]; then
   USE_CUDA=0
 fi
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  USE_CUDA=0
+fi
 
 if [[ "$USE_CUDA" -eq 1 ]]; then
   if grep -qiE "microsoft|wsl" /proc/version 2>/dev/null; then
