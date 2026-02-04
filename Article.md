@@ -155,7 +155,7 @@ For teams working with multiple LLM-based tools, this eliminates a common pain p
 
 ## The Demo Flow (Designed for Humans)
 
-The demo script (`demo.sh`) is optimized for blog posts and presentations:
+The demo script (`demo.sh`) has the following functionality:
 
 1. **Build and test** - Validates the system is working  
 2. **Multi-round local debate** - Shows agent reasoning  
