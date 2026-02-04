@@ -100,8 +100,10 @@ int main(int argc, char** argv) {
   }
 
   const std::string topic = options->topic;
-  std::cout << rang::style::bold << rang::fg::cyan << "Debate topic: " << rang::style::reset
-            << topic << "\n";
+  if (options->topic_set) {
+    std::cout << rang::style::bold << rang::fg::cyan << "Debate topic: " << rang::style::reset
+              << topic << "\n";
+  }
   std::cout << rang::fg::yellow << "Model: " << rang::fg::reset << options->model << "\n";
   std::cout << rang::fg::yellow << "Rounds: " << rang::fg::reset << options->rounds << "\n";
   std::cout << rang::fg::yellow << "Streaming: " << rang::fg::reset
@@ -115,29 +117,29 @@ int main(int argc, char** argv) {
               << deepseek::ModelStore::ResolveModelPath("deepseek-r1") << "\n";
   }
 
-  app::LogicGate gate("Allow only software engineering topics.");
-  if (options->local_only) {
-    // Local gate is deterministic for demo reliability.
-    if (!IsEngineeringTopic(topic)) {
-      std::cerr << rang::fg::red << "Gate rejected the topic." << rang::fg::reset << "\n";
-      return 1;
+  auto run_topic = [&](std::string_view t) -> bool {
+    app::LogicGate gate("Allow only software engineering topics.");
+    if (options->local_only) {
+      // Local gate is deterministic for demo reliability.
+      if (!IsEngineeringTopic(t)) {
+        std::cerr << rang::fg::red << "Gate rejected the topic." << rang::fg::reset << "\n";
+        return false;
+      }
+    } else {
+      std::string gate_error;
+      auto gate_result = gate.Evaluate(backend, t, false, &gate_error);
+      if (!gate_result) {
+        std::cerr << rang::fg::red << "Gate evaluation failed: " << rang::fg::reset << gate_error
+                  << "\n";
+        return false;
+      }
+      if (!gate_result->allow) {
+        std::cerr << rang::fg::red << "Gate rejected the topic." << rang::fg::reset << "\n";
+        return false;
+      }
     }
-  } else {
-    std::string gate_error;
-    auto gate_result = gate.Evaluate(backend, topic, false, &gate_error);
-    if (!gate_result) {
-      std::cerr << rang::fg::red << "Gate evaluation failed: " << rang::fg::reset << gate_error
-                << "\n";
-      return 1;
-    }
-    if (!gate_result->allow) {
-      std::cerr << rang::fg::red << "Gate rejected the topic." << rang::fg::reset << "\n";
-      return 1;
-    }
-  }
 
-  try {
-    auto results = app::RunDebateRounds(backend, agents, topic, options->rounds, options->stream);
+    auto results = app::RunDebateRounds(backend, agents, t, options->rounds, options->stream);
     std::cout << "\n\n" << rang::style::bold << "--- Summary ---" << rang::style::reset << "\n";
     for (const auto& result : results) {
       if (result.name == "Researcher") {
@@ -153,6 +155,36 @@ int main(int argc, char** argv) {
       std::string line;
       std::getline(std::cin, line);
     }
+    return true;
+  };
+
+  try {
+    if (options->topic_set) {
+      if (!run_topic(topic)) {
+        return 1;
+      }
+    } else {
+      std::cout << rang::fg::cyan << "Interactive mode. Type a topic, or 'exit' to quit."
+                << rang::fg::reset << "\n";
+      while (true) {
+        std::cout << rang::fg::green << "> " << rang::fg::reset;
+        std::string line;
+        if (!std::getline(std::cin, line)) {
+          break;
+        }
+        if (line == "exit" || line == "quit") {
+          break;
+        }
+        if (line.empty()) {
+          continue;
+        }
+        if (!run_topic(line)) {
+          // Keep the CLI running even if a gate rejects.
+          continue;
+        }
+      }
+    }
+
     if (!options->save_path.empty()) {
       std::string save_error;
       if (!app::SaveAgents(agents, options->save_path, &save_error)) {

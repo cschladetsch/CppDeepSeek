@@ -107,7 +107,10 @@ The folder is designed to be split into its own repo later — which makes it ea
 
 ## The Demo Flow (Designed for Humans)
 
-The demo script (`demo.sh`) is optimized for a human viewer:
+The demo script (`demo.sh`) is optimized for a human viewer. The app itself now starts in an
+interactive CLI by default — type a topic and press ENTER.
+
+The demo flow:
 
 1. Builds and tests.  
 2. Runs a multi‑round local debate.  

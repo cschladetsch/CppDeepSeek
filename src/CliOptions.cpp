@@ -10,7 +10,7 @@ std::string Usage() {
   out << "Usage:\n"
       << "  CppDeepSeek [options]\n\n"
       << "Options:\n"
-      << "  --topic <text>     Debate topic\n"
+      << "  --topic <text>     Debate topic (otherwise interactive CLI)\n"
       << "  --model <name>     Model name (default: deepseek-reasoner)\n"
       << "  --rounds <n>       Debate rounds (default: 1)\n"
       << "  --stream           Enable streaming (default)\n"
@@ -58,6 +58,7 @@ std::optional<CliOptions> ParseCli(int argc, char** argv, std::string* error_out
       std::string value = argv[++i];
       if (arg == "--topic") {
         opts.topic = value;
+        opts.topic_set = true;
       } else if (arg == "--model") {
         opts.model = value;
       } else if (arg == "--load") {

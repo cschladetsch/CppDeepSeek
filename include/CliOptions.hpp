@@ -6,7 +6,8 @@
 namespace app {
 
 struct CliOptions {
-  std::string topic = "Is C++ the future of AI agents? Argue your position.";
+  std::string topic;
+  bool topic_set = false;
   std::string model = "deepseek-reasoner";
   int rounds = 1;
   bool stream = true;

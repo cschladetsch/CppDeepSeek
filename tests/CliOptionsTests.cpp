@@ -12,6 +12,7 @@ TEST(CliOptionsTests, Defaults) {
   EXPECT_TRUE(opts->stream);
   EXPECT_FALSE(opts->help);
   EXPECT_TRUE(opts->local_only);
+  EXPECT_FALSE(opts->topic_set);
 }
 
 TEST(CliOptionsTests, ParsesValues) {

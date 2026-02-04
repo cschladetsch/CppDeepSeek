@@ -45,10 +45,11 @@ cmake -S . -B build -DCPPDEEPSEEK_BUILD_APP=ON
 cmake --build build
 ```
 
-**Run (local-only default, uses llama.cpp)**
+**Run (interactive CLI by default)**
 ```bash
 ./build/CppDeepSeek
 ```
+Type a topic and press ENTER. Use `exit` to quit.
 Note: the app pauses between agent responses and waits for ENTER.
 
 **Run with DeepSeek API**
