@@ -7,6 +7,8 @@ High-performance C++20 client for DeepSeek-R1 with reasoning separation, streami
 ./b --deps
 ./b --demo
 ```
+If you plan to run tests offline, clone with submodules or run
+`git submodule update --init --recursive` to fetch the vendored googletest.
 `demo.sh` requires CUDA by default. Use `DEMO_NO_CUDA=1` to run CPU-only. To offload with llama.cpp
 on GPU (CUDA/Metal), set `DEMO_GPU_LAYERS` (e.g., `DEMO_GPU_LAYERS=20` or `DEMO_GPU_LAYERS=auto`).
 

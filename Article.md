@@ -192,6 +192,8 @@ cd CppDeepSeekAgents
 ./b --deps    # Install dependencies + download model
 ./b --demo    # Run full demo
 ```
+For offline tests, clone with `--recurse-submodules` or run
+`git submodule update --init --recursive` to fetch the vendored googletest.
 
 **Platform-specific notes:**
 
